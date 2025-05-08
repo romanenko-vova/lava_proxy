@@ -10,6 +10,15 @@ from helpers import parse_request_body, build_salebot_params, get_subscription_d
 
 router = APIRouter()
 
+@router.get("/", status_code=status.HTTP_200_OK)
+async def root():
+    """Корневой маршрут для проверки статуса сервиса."""
+    return {
+        "status": "ok", 
+        "service": "Lava → SaleBot proxy", 
+        "endpoints": ["/payment", "/regular_pay"]
+    }
+
 
 @router.post("/payment", status_code=status.HTTP_200_OK)
 async def new_lava_hook(request: Request):
