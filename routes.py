@@ -32,6 +32,24 @@ async def new_lava_hook(request: Request):
     # Парсим тело запроса
     payload = await parse_request_body(request)
     
+    # Проверяем статус платежа
+    event_type = payload.get("eventType", "")
+    payment_status = payload.get("status", "")
+    error_message = payload.get("errorMessage", "")
+    
+    # Если платеж неуспешный, логируем и завершаем обработку
+    if "failed" in event_type or "failed" in payment_status:
+        print(f"Skipping failed payment. Status: {payment_status}, Event: {event_type}, Error: {error_message}")
+        return {
+            "status": "skipped", 
+            "reason": "Payment failed", 
+            "details": {
+                "status": payment_status,
+                "event_type": event_type,
+                "error_message": error_message
+            }
+        }
+    
     # Получаем clientUtm из payload
     client_utm = payload.get("clientUtm", {})
     if not client_utm:
@@ -87,6 +105,24 @@ async def regular_pay(request: Request):
     
     # Парсим тело запроса
     payload = await parse_request_body(request)
+    
+    # Проверяем статус платежа
+    event_type = payload.get("eventType", "")
+    payment_status = payload.get("status", "")
+    error_message = payload.get("errorMessage", "")
+    
+    # Если платеж неуспешный, логируем и завершаем обработку
+    if "failed" in event_type or "failed" in payment_status:
+        print(f"Skipping failed payment. Status: {payment_status}, Event: {event_type}, Error: {error_message}")
+        return {
+            "status": "skipped", 
+            "reason": "Payment failed", 
+            "details": {
+                "status": payment_status,
+                "event_type": event_type,
+                "error_message": error_message
+            }
+        }
     
     # Получаем parentContractId
     parent_contract_id = payload.get("parentContractId")
